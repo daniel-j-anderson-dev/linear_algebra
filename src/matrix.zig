@@ -71,5 +71,46 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
             if (IN_DEBUG_MODE) assertInBounds(row, column);
             return &self.rows[row][column];
         }
+
+        // operators
+        pub fn transpose(self: *const Matrix(T, HEIGHT, WIDTH)) Matrix(T, WIDTH, HEIGHT) {
+            var transposed = Matrix(T, WIDTH, HEIGHT).ZEROS;
+            for (0..HEIGHT) |i| {
+                for (0..WIDTH) |j| {
+                    const self_element = self.getUnchecked(i, j);
+                    const transpose_element = transposed.getMutableUnchecked(j, i);
+
+                    transpose_element.* = self_element.*;
+                }
+            }
+            return transposed;
+        }
+        pub fn add(lhs: *const Self, rhs: *const Self) Self {
+            var sum = Self.ZEROS;
+            for (0..HEIGHT) |i| {
+                for (0..WIDTH) |j| {
+                    const lhs_element = lhs.getUnchecked(i, j);
+                    const rhs_element = rhs.getUnchecked(i, j);
+                    const sum_element = sum.getMutableUnchecked(i, j);
+
+                    sum_element.* = lhs_element.* + rhs_element.*;
+                }
+            }
+            return sum;
+        }
+        pub fn negate(self: *const Self) Self {
+            var negated = self.clone();
+            for (0..HEIGHT) |i| {
+                for (0..WIDTH) |j| {
+                    const self_element = self.getUnchecked(i, j);
+                    const negated_element = negated.getMutUnchecked(i, j);
+                    negated_element.* = -(self_element.*);
+                }
+            }
+            return negated;
+        }
+        pub fn subtract(lhs: *const Self, rhs: *const Self) Self {
+            return lhs.add(rhs.negate());
+        }
     };
 }
