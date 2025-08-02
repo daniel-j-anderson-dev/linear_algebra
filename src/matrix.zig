@@ -29,5 +29,23 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
         pub fn assertInBounds(row: usize, column: usize) void {
             if (outOfBounds(row, column)) @panic("index out of bounds");
         }
+
+        // constructors
+        pub const ZEROS = Self{ .rows = [1][WIDTH]T{[_]T{0} ** WIDTH} ** HEIGHT };
+        pub fn multiplicativeIdentity() Self {
+            if (HEIGHT != WIDTH) @compileError("multiplicative identity matrix must be square");
+            var id = Self.ZEROS;
+            for (0..HEIGHT) |i| {
+                const id_element = id.getMutableUnchecked(i, i);
+                id_element.* = 1;
+            }
+            return id;
+        }
+        pub fn fromArray(rows: [HEIGHT][WIDTH]T) Self {
+            return Self{ .rows = rows };
+        }
+        pub fn clone(self: *const Self) Self {
+            return Self.fromArray(&self.rows);
+        }
     };
 }
