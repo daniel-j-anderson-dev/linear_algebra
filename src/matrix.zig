@@ -33,7 +33,8 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
         // constructors
         pub const ZEROS = Self{ .rows = [1][WIDTH]T{[_]T{0} ** WIDTH} ** HEIGHT };
         pub fn multiplicativeIdentity() Self {
-            if (HEIGHT != WIDTH) @compileError("multiplicative identity matrix must be square");
+            if (!IS_SQUARE) @compileError("multiplicative identity matrix must be square");
+
             var id = Self.ZEROS;
             for (0..HEIGHT) |i| {
                 const id_element = id.getMutableUnchecked(i, i);
@@ -137,6 +138,18 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
 
                         dot_product.* += lhs_element.* * rhs_element.*;
                     }
+                }
+            }
+            return product;
+        }
+        pub fn scalar_multiply(self: *const Self, scalar: *const T) Self {
+            var product = Self.ZEROS;
+            for (0..HEIGHT) |i| {
+                for (0..WIDTH) |j| {
+                    const product_element = product.getMutableUnchecked(i, j);
+                    const self_element = self.getUnchecked(i, j);
+
+                    product_element.* = scalar * self_element.*;
                 }
             }
             return product;
