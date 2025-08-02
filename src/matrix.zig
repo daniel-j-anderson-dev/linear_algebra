@@ -29,6 +29,9 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
         pub fn assertInBounds(row: usize, column: usize) void {
             if (outOfBounds(row, column)) @panic("index out of bounds");
         }
+        pub fn assertNonZero(n: usize) void {
+            if (n != 0) @panic("n is zero");
+        }
 
         // constructors
         pub const ZEROS = Self{ .rows = [1][WIDTH]T{[_]T{0} ** WIDTH} ** HEIGHT };
@@ -215,14 +218,12 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
         pub fn inverse(self: *const Self) ?Self {
             const det = self.determinant();
             if (det == 0) return null;
-            const C = self.matrixOfCofactors();
-            return C.transpose().scalar_multiply(det);
+            return self.matrixOfCofactors().transpose().scalar_multiply(1 / det);
         }
         pub fn inverseUnchecked(self: *const Self) Self {
             const det = self.determinant();
-            if (IN_DEBUG_MODE) if (det == 0) @panic("Inverse does not exists for matrices with determinant of zero");
-            const C = self.matrixOfCofactors();
-            return C.transpose().scalar_multiply(det);
+            if (IN_DEBUG_MODE) assertNonZero(det);
+            return self.matrixOfCofactors().transpose().scalar_multiply(1 / det);
         }
     };
 }
