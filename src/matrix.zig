@@ -47,5 +47,29 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
         pub fn clone(self: *const Self) Self {
             return Self.fromArray(&self.rows);
         }
+
+        // getters
+        pub fn height(_: *const Self) usize {
+            return HEIGHT;
+        }
+        pub fn width(_: *const Self) usize {
+            return WIDTH;
+        }
+        pub fn get(self: *const Self, row: usize, column: usize) ?*const T {
+            if (outOfBounds(row, column)) return null;
+            return &self.rows[row][column];
+        }
+        pub fn getMutable(self: *const Self, row: usize, column: usize) ?*T {
+            if (outOfBounds(row, column)) return null;
+            return &self.rows[row][column];
+        }
+        pub fn getUnchecked(self: *const Self, row: usize, column: usize) *const T {
+            if (IN_DEBUG_MODE) assertInBounds(row, column);
+            return &self.rows[row][column];
+        }
+        pub fn getMutableUnchecked(self: *const Self, row: usize, column: usize) *T {
+            if (IN_DEBUG_MODE) assertInBounds(row, column);
+            return &self.rows[row][column];
+        }
     };
 }
