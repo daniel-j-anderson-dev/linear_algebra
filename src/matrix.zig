@@ -112,5 +112,24 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
         pub fn subtract(lhs: *const Self, rhs: *const Self) Self {
             return lhs.add(rhs.negate());
         }
+        pub fn multiply(
+            comptime RHS_WIDTH: usize,
+            lhs: *const Matrix(T, HEIGHT, WIDTH),
+            rhs: *const Matrix(T, WIDTH, RHS_WIDTH),
+        ) Matrix(T, HEIGHT, RHS_WIDTH) {
+            var product = Matrix(T, HEIGHT, RHS_WIDTH).ZEROS;
+            for (0..HEIGHT) |lhs_row_index| {
+                for (0..RHS_WIDTH) |rhs_column_index| {
+                    const dot_product = product.getMutableUnchecked(lhs_row_index, rhs_column_index);
+                    for (0..WIDTH) |i| {
+                        const lhs_element = lhs.getUnchecked(lhs_row_index, i);
+                        const rhs_element = rhs.getUnchecked(i, rhs_column_index);
+
+                        dot_product.* += lhs_element.* * rhs_element.*;
+                    }
+                }
+            }
+            return product;
+        }
     };
 }
