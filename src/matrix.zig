@@ -21,5 +21,13 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
 
         // types
         const Self = @This();
+
+        // helpers
+        pub fn outOfBounds(row: usize, column: usize) bool {
+            return row >= HEIGHT or column >= WIDTH;
+        }
+        pub fn assertInBounds(row: usize, column: usize) void {
+            if (outOfBounds(row, column)) @panic("index out of bounds");
+        }
     };
 }
