@@ -212,5 +212,17 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
             const sign: T = if ((row + column) % 2 == 0) 1 else -1;
             return sign * self.minorUnchecked(row, column).determinant();
         }
+        pub fn inverse(self: *const Self) ?Self {
+            const det = self.determinant();
+            if (det == 0) return null;
+            const C = self.matrixOfCofactors();
+            return C.transpose().scalar_multiply(det);
+        }
+        pub fn inverseUnchecked(self: *const Self) Self {
+            const det = self.determinant();
+            if (IN_DEBUG_MODE) if (det == 0) @panic("Inverse does not exists for matrices with determinant of zero");
+            const C = self.matrixOfCofactors();
+            return C.transpose().scalar_multiply(det);
+        }
     };
 }
