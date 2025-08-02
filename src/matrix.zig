@@ -153,5 +153,41 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
             }
             return sum;
         }
+        pub fn minor(self: *const Self, row: usize, column: usize) ?Matrix(T, HEIGHT - 1, WIDTH - 1) {
+            if (outOfBounds(row, column)) return null;
+            return self.minorUnchecked(row, column);
+        }
+        pub fn cofactor(self: *const Self, row: usize, column: usize) ?T {
+            if (outOfBounds(row, column)) return null;
+            return self.cofactorUnchecked(row, column);
+        }
+        pub fn minorUnchecked(self: *const Self, row: usize, column: usize) Matrix(T, HEIGHT - 1, WIDTH - 1) {
+            if (IN_DEBUG_MODE) assertInBounds(row, column);
+
+            var minor_ = Matrix(T, HEIGHT - 1, WIDTH - 1).ZEROS;
+
+            var minor_row: usize = 0;
+            for (0..HEIGHT) |i| {
+                if (i == row) continue;
+
+                var minor_column: usize = 0;
+                for (0..WIDTH) |j| {
+                    if (j == column) continue;
+
+                    const minor_element = minor_.getMutableUnchecked(minor_row, minor_column);
+                    const self_element = self.getUnchecked(i, j);
+
+                    minor_element.* = self_element.*;
+
+                    minor_column += 1;
+                }
+                minor_row += 1;
+            }
+            return minor_;
+        }
+        pub fn cofactorUnchecked(self: *const Self, row: usize, column: usize) T {
+            const sign: T = if ((row + column) % 2 == 0) 1 else -1;
+            return sign * self.minorUnchecked(row, column).determinant();
+        }
     };
 }
