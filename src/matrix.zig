@@ -47,6 +47,16 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
         pub fn clone(self: *const Self) Self {
             return Self.fromArray(&self.rows);
         }
+        pub fn matrixOfCofactors(self: *const Self) Self {
+            var c = Self.ZEROS;
+            for (0..HEIGHT) |i| {
+                for (0..WIDTH) |j| {
+                    const cofactor_element = c.getMutableUnchecked(i, j);
+                    cofactor_element.* = self.cofactorUnchecked(i, j);
+                }
+            }
+            return c;
+        }
 
         // getters
         pub fn height(_: *const Self) usize {
@@ -157,10 +167,6 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
             if (outOfBounds(row, column)) return null;
             return self.minorUnchecked(row, column);
         }
-        pub fn cofactor(self: *const Self, row: usize, column: usize) ?T {
-            if (outOfBounds(row, column)) return null;
-            return self.cofactorUnchecked(row, column);
-        }
         pub fn minorUnchecked(self: *const Self, row: usize, column: usize) Matrix(T, HEIGHT - 1, WIDTH - 1) {
             if (IN_DEBUG_MODE) assertInBounds(row, column);
 
@@ -184,6 +190,10 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
                 minor_row += 1;
             }
             return minor_;
+        }
+        pub fn cofactor(self: *const Self, row: usize, column: usize) ?T {
+            if (outOfBounds(row, column)) return null;
+            return self.cofactorUnchecked(row, column);
         }
         pub fn cofactorUnchecked(self: *const Self, row: usize, column: usize) T {
             const sign: T = if ((row + column) % 2 == 0) 1 else -1;
