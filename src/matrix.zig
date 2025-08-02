@@ -131,5 +131,27 @@ pub fn Matrix(T: type, H: usize, W: usize) type {
             }
             return product;
         }
+        pub fn determinant(self: *const Self) T {
+            if (!IS_SQUARE) @compileError("Determinant is only defined for square matrices");
+
+            if (WIDTH == 2 and HEIGHT == 2) {
+                const a = self.getUnchecked(0, 0).*;
+                const b = self.getUnchecked(0, 1).*;
+                const c = self.getUnchecked(1, 0).*;
+                const d = self.getUnchecked(1, 1).*;
+                return a * d - c * b;
+            }
+            if (WIDTH == 1 and HEIGHT == 1) return self.getUnchecked(0, 0).*;
+
+            var sum: T = 0;
+            const i = 0;
+            for (0..WIDTH) |j| {
+                const self_element = self.getUnchecked(i, j);
+                const self_cofactor = self.cofactor(i, j);
+
+                sum = sum + (self_element.* * self_cofactor);
+            }
+            return sum;
+        }
     };
 }
